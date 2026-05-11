@@ -1,0 +1,45 @@
+{
+  "proxy_port": 8080,
+  "admin_port": 8888,
+  "redirect_all": false,
+  "mitm_hosts": [
+    "*.openai.com",
+    "*.deepseek.com",
+    "*.qoder.sh",
+    "*.qq.com",
+    "*.yaohuo.me",
+    "*.openrouter.ai",
+    "openrouter.ai",
+    "1new.900809.xyz",
+    "chatboxai.app",
+    "yaohuo.me"
+  ],
+  "upstreams": [
+    {
+      "name": "新分组1",
+      "base_url": "http://192.168.50.99:8317",
+      "hosts": [
+        "*.openai.com"
+      ],
+      "rewrites": [],
+      "headers": [],
+      "is_remainder": false
+    },
+    {
+      "name": "新分组2",
+      "base_url": "http://new.900809.xyz",
+      "hosts": [
+        "*.deepseek.com"
+      ],
+      "rewrites": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "action": "SET",
+          "value": " Bearer sk-HWxqg887VPtGP1LpVo4vjwr3bvvW9zaXLCiVDPQzTNACVOG8"
+        }
+      ],
+      "is_remainder": true
+    }
+  ]
+}
