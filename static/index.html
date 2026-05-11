@@ -3,380 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AiMITM 绠＄悊鍚庡彴</title>
+    <title>AiMITM 管理后台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #e2e8f0; }
         .log-container { height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .rule-card { transition: all 0.2s; background-color: #1e293b; border-color: #334155; }
-        .rule-card:hover { border-color: #3b82f6; }
-        .host-pill { cursor: pointer; transition: all 0.2s; }
-        .host-pill.selected { background-color: #3b82f6; color: white; border-color: #3b82f6; }
-        input, textarea, select { background-color: #0f172a !important; color: #f8fafc !important; border-color: #334155 !important; }
-        input:focus, textarea:focus, select:focus { border-color: #3b82f6 !important; ring-color: #3b82f6 !important; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .card { @apply bg-slate-800/50 border border-slate-700 rounded-xl p-6 backdrop-blur-sm; }
+        .input-field { @apply bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all; }
+        .btn-primary { @apply bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20 active:scale-95; }
+        .tab-btn { @apply px-4 py-2 font-medium transition-all border-b-2 border-transparent; }
+        .tab-btn.active { @apply border-blue-500 text-blue-500; }
     </style>
 </head>
-<body class="min-h-screen">
-    <div class="container mx-auto py-8 px-4 max-w-6xl">
-        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-black text-xl">A</div>
+<body class="p-8 min-h-screen">
+    <div class="max-w-6xl mx-auto space-y-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="bg-blue-600 p-2 rounded-lg mr-3 shadow-lg shadow-blue-500/30">
+                    <span class="font-black text-xl text-white">A</span>
+                </div>
                 <h1 class="text-2xl font-black tracking-tight text-white">AiMITM <span class="text-blue-500 text-sm font-normal">Core</span></h1>
             </div>
-            <div id="status" class="flex items-center space-x-4 text-sm">
-                <span class="flex items-center space-x-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span>杩愯涓?/span>
-                </span>
-                <a href="/api/ca/download" class="text-slate-400 hover:text-white transition-colors flex items-center space-x-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>涓嬭浇鏍硅瘉涔?/span>
+            <div class="flex gap-4 items-center text-sm">
+                <span class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> 节点在线</span>
+                <span class="text-slate-400">|</span>
+                <a href="/api/ca/download" class="text-slate-400 hover:text-white flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    下载根证书
                 </a>
             </div>
         </header>
 
-        <nav class="flex space-x-6 mb-8">
-            <button onclick="showTab('config')" class="tab-btn pb-2 font-bold text-blue-500 border-b-2 border-blue-500 transition-all">閰嶇疆绠＄悊</button>
-            <button onclick="showTab('logs')" class="tab-btn pb-2 font-bold text-slate-500 hover:text-slate-300 transition-all">瀹炴椂鐩戞帶</button>
-        </nav>
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-700 gap-4">
+            <button class="tab-btn active">核心配置</button>
+            <button class="tab-btn text-slate-400">实时日志</button>
+        </div>
 
-        <!-- 閰嶇疆绠＄悊 -->
-        <div id="tab-config" class="tab-content active space-y-8">
-            <!-- 澶撮儴锛氭牳蹇冩湇鍔℃帶鍒?-->
-            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm">
-                <div class="flex justify-between items-start">
-                    <div class="space-y-6 flex-1">
-                        <h2 class="text-lg font-bold text-slate-200 flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                            <span>鏍稿績鏈嶅姟鍙傛暟</span>
-                        </h2>
-                        <div class="grid grid-cols-2 gap-6 max-w-md">
-                            <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">浠ｇ悊鐩戝惉绔彛</label>
-                                <input type="number" id="proxy_port" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">绠＄悊鍚庡彴绔彛</label>
-                                <input type="number" id="admin_port" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-4 pt-2">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">璋冭瘯妯″紡 (Debug)</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="debug_mode" onchange="configData.debug=this.checked" class="sr-only peer">
-                                <div class="w-10 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white"></div>
-                            </label>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Config Card -->
+            <div class="card md:col-span-2 space-y-6">
+                <h2 class="text-lg font-bold">基础参数</h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 uppercase font-bold">代理端口</label>
+                        <input id="proxy_port" type="number" class="input-field w-full">
                     </div>
-                    <div class="bg-red-500/5 p-6 rounded-2xl border border-red-500/20 flex flex-col items-center justify-center space-y-3 min-w-[200px]">
-                        <span class="text-[10px] font-black text-red-500 uppercase tracking-widest">寮哄埗鍏ㄥ煙鍚嶅姭鎸?/span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="redirect_all" onchange="configData.redirect_all=this.checked" class="sr-only peer">
-                            <div class="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600 peer-checked:after:bg-white"></div>
-                        </label>
-                        <span class="text-[10px] text-red-500/60 text-center leading-relaxed font-medium">璀﹀憡锛氬紑鍚悗鎵€鏈?br>HTTPS 娴侀噺灏嗚鎷︽埅</span>
+                    <div class="space-y-2">
+                        <label class="text-xs text-slate-400 uppercase font-bold">管理端口</label>
+                        <input id="admin_port" type="number" class="input-field w-full">
                     </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                    <div>
+                        <span class="text-sm font-bold text-red-400">全量重定向 (Redirect All)</span>
+                        <p class="text-xs text-slate-500">开启后所有请求将进入分流逻辑</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="redirect_all" type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-slate-400">调试模式</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input id="debug" type="checkbox" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
                 </div>
             </div>
 
-            <div class="grid grid-cols-12 gap-8">
-                <!-- 宸︿晶锛歁ITM 鍚嶅崟 -->
-                <div class="col-span-4 space-y-4">
-                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 h-full">
-                        <h2 class="text-lg font-bold mb-4 text-slate-200 border-l-4 border-blue-500 pl-3">MITM 鎷︽埅鍚嶅崟</h2>
-                        <p class="text-xs text-slate-500 mb-6 leading-relaxed">闈炲叏鍔寔妯″紡涓嬶紝浠呭湪姝ゅ悕鍗曞唴鐨勫煙鍚嶄細琚В瀵嗐€傛敮鎸侀€氶厤绗﹀ <code class="text-blue-400">*.openai.com</code></p>
-                        <textarea id="mitm_hosts_input" rows="18" oninput="updateAvailableHosts()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 font-mono text-sm custom-scrollbar outline-none focus:ring-1 focus:ring-blue-500 transition-all" placeholder="*.openai.com&#10;api.github.com"></textarea>
-                    </div>
-                </div>
-
-                <!-- 鍙充晶锛氫笂娓告槧灏勭煩闃?-->
-                <div class="col-span-8 space-y-6">
-                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-700/50">
-                            <h2 class="text-lg font-bold text-slate-200 border-l-4 border-emerald-500 pl-3">涓婃父杞彂瑙勫垯</h2>
-                            <div class="flex space-x-3">
-                                <button onclick="addUpstream()" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-sm font-bold border border-slate-600">+ 鏂板涓婃父</button>
-                                <button onclick="saveConfig()" class="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 font-black shadow-lg shadow-blue-900/20 transition-all text-sm">搴旂敤鏇存敼</button>
-                            </div>
-                        </div>
-                        
-                        <div id="upstreams-list" class="space-y-6">
-                            <!-- 鍔ㄦ€佺敓鎴?-->
-                        </div>
-                    </div>
-                </div>
+            <!-- MITM List Card -->
+            <div class="card space-y-4">
+                <h2 class="text-lg font-bold">MITM 域名</h2>
+                <textarea id="mitm_hosts" class="input-field w-full h-64 text-sm font-mono" placeholder="*.openai.com"></textarea>
             </div>
         </div>
 
-        <!-- 瀹炴椂鏃ュ織 -->
-        <div id="tab-logs" class="tab-content space-y-4">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-                <div class="bg-slate-800 px-4 py-2 border-b border-slate-700 flex justify-between items-center">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Real-time Traffic Monitor</span>
-                    <button onclick="document.getElementById('log-list').innerHTML=''" class="text-[10px] text-slate-500 hover:text-slate-300">娓呯┖鏃ュ織</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="card space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold">转发规则组</h2>
+                    <button onclick="saveConfig()" class="btn-primary">保存配置</button>
                 </div>
-                <div id="log-list" class="log-container custom-scrollbar p-4 text-[11px] space-y-1">
-                    <div class="text-slate-600 italic">绛夊緟鏁版嵁娴佹帴鍏?..</div>
-                </div>
+                <div id="upstreams-container" class="space-y-3"></div>
+            </div>
+
+            <div class="card space-y-4">
+                <h2 class="text-lg font-bold text-blue-400">实时事件</h2>
+                <div id="events" class="log-container space-y-2 text-xs"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let configData = { upstreams: [], mitm_hosts: [] };
-        let allAvailableHosts = [];
-
         async function loadConfig() {
             const res = await fetch('/api/config');
-            configData = await res.json();
-            document.getElementById('mitm_hosts_input').value = (configData.mitm_hosts || []).join('\n');
-            document.getElementById('proxy_port').value = configData.proxy_port || 8080;
-            document.getElementById('admin_port').value = configData.admin_port || 8888;
-            document.getElementById('redirect_all').checked = configData.redirect_all || false;
-            document.getElementById('debug_mode').checked = configData.debug || false;
-            updateAvailableHosts();
-            renderUpstreams();
-        }
-
-        function updateAvailableHosts() {
-            const input = document.getElementById('mitm_hosts_input').value;
-            allAvailableHosts = input.split('\n').map(h => h.trim()).filter(h => h);
-            renderUpstreams();
+            const cfg = await res.json();
+            document.getElementById('proxy_port').value = cfg.proxy_port;
+            document.getElementById('admin_port').value = cfg.admin_port;
+            document.getElementById('debug').checked = cfg.debug;
+            document.getElementById('redirect_all').checked = cfg.redirect_all;
+            document.getElementById('mitm_hosts').value = cfg.mitm_hosts.join('\n');
+            
+            const container = document.getElementById('upstreams-container');
+            container.innerHTML = cfg.upstreams.map(g => `
+                <div class="p-3 bg-slate-900/50 border border-slate-700 rounded-lg">
+                    <div class="font-bold text-blue-400 mb-1">${g.name}</div>
+                    <div class="text-[10px] text-slate-400">${g.base_url}</div>
+                </div>
+            `).join('');
         }
 
         async function saveConfig() {
-            const saveBtn = event.target;
-            const originalText = saveBtn.innerText;
-            saveBtn.innerText = '鍚屾涓?..';
-            saveBtn.disabled = true;
-
-            try {
-                configData.mitm_hosts = allAvailableHosts;
-                configData.proxy_port = parseInt(document.getElementById('proxy_port').value);
-                configData.admin_port = parseInt(document.getElementById('admin_port').value);
-                configData.redirect_all = document.getElementById('redirect_all').checked;
-                configData.debug = document.getElementById('debug_mode').checked;
-                
-                const res = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(configData)
-                });
-                
-                if (res.ok) alert('鉁?閰嶇疆宸茬敓鏁?);
-                else alert('鉂?淇濆瓨澶辫触');
-            } catch (e) {
-                alert('鉂?缃戠粶閿欒');
-            } finally {
-                saveBtn.innerText = originalText;
-                saveBtn.disabled = false;
-            }
-        }
-
-        function renderUpstreams() {
-            const container = document.getElementById('upstreams-list');
-            const usedHosts = new Set();
-            configData.upstreams.forEach(g => {
-                (g.hosts || []).forEach(h => usedHosts.add(h));
+            const cfg = {
+                proxy_port: parseInt(document.getElementById('proxy_port').value),
+                admin_port: parseInt(document.getElementById('admin_port').value),
+                debug: document.getElementById('debug').checked,
+                redirect_all: document.getElementById('redirect_all').checked,
+                mitm_hosts: document.getElementById('mitm_hosts').value.split('\n').filter(h => h.trim()),
+                upstreams: [] // 暂不修改 Upstreams 结构
+            };
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cfg)
             });
-
-            container.innerHTML = configData.upstreams.map((group, gIdx) => {
-                const isRemainder = group.is_remainder;
-                return `
-                <div class="rule-card border p-6 rounded-2xl relative shadow-sm">
-                    <button onclick="removeUpstream(${gIdx})" class="absolute top-4 right-4 text-slate-600 hover:text-red-500 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                    
-                    <div class="grid grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">涓婃父缁勬爣璇?/label>
-                            <input type="text" oninput="configData.upstreams[${gIdx}].name=this.value" value="${group.name}" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold focus:border-blue-500 outline-none transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">鍚庣 BaseURL</label>
-                            <input type="text" oninput="configData.upstreams[${gIdx}].base_url=this.value" value="${group.base_url}" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-blue-400 font-mono focus:border-blue-500 outline-none transition-all" placeholder="https://api.openai.com">
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <div class="flex justify-between items-center mb-3">
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">鍒嗛厤鎷︽埅鍩熷悕</label>
-                            <label class="flex items-center text-[10px] font-bold text-orange-400 cursor-pointer hover:text-orange-300 transition-colors">
-                                <input type="checkbox" onchange="toggleRemainder(${gIdx}, this.checked)" ${isRemainder ? 'checked' : ''} class="mr-2"> 鎵挎帴鎵€鏈夊墿浣欏煙鍚?                            </label>
-                        </div>
-                        <div class="flex flex-wrap gap-2 p-4 bg-slate-900/50 border border-slate-700 rounded-xl min-h-[60px]">
-                            ${isRemainder ? 
-                                '<span class="text-orange-400 text-[10px] font-black uppercase tracking-tighter italic">Remainder Mode: 澶勭悊鎵€鏈夋湭鍖归厤娴侀噺</span>' :
-                                (allAvailableHosts.length === 0 ? '<span class="text-slate-700 text-[10px]">璇峰厛鍦ㄥ乏渚ц緭鍏ユ嫤鎴悕鍗?/span>' : 
-                                allAvailableHosts.map(host => {
-                                    const isSelected = (group.hosts || []).includes(host);
-                                    const isDisabled = !isSelected && usedHosts.has(host);
-                                    return `
-                                        <span onclick="${isDisabled ? '' : `toggleHost(${gIdx}, '${host}')`}" 
-                                              class="host-pill px-3 py-1.5 rounded-lg text-[10px] font-bold border ${isSelected ? 'selected' : (isDisabled ? 'bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed' : 'bg-slate-800/50 text-slate-400 border-slate-700 hover:border-slate-500')}" title="${host}">
-                                            ${host}
-                                        </span>
-                                    `;
-                                }).join(''))
-                            }
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                                    Header 閲嶅啓 (API Key)
-                                </span>
-                                <button onclick="addHeaderRule(${gIdx})" class="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-tighter transition-colors">+ 娣诲姞 Header</button>
-                            </div>
-                            <div class="space-y-2">
-                                ${(group.headers || []).map((rule, hIdx) => `
-                                    <div class="flex gap-2 items-center">
-                                        <input type="text" oninput="configData.upstreams[${gIdx}].headers[${hIdx}].name=this.value" value="${rule.name}" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg w-32 font-mono outline-none focus:border-blue-500" placeholder="Header">
-                                        <select onchange="configData.upstreams[${gIdx}].headers[${hIdx}].action=this.value" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg outline-none focus:border-blue-500">
-                                            <option value="SET" ${rule.action==='SET'?'selected':''}>SET</option>
-                                            <option value="REMOVE" ${rule.action==='REMOVE'?'selected':''}>REMOVE</option>
-                                        </select>
-                                        <input type="text" oninput="configData.upstreams[${gIdx}].headers[${hIdx}].value=this.value" value="${rule.value || ''}" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg flex-1 outline-none focus:border-blue-500" placeholder="Value (Bearer ...)">
-                                        <button onclick="removeHeaderRule(${gIdx}, ${hIdx})" class="text-slate-600 hover:text-red-500 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                                        </button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-700">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                                    JSON 閲嶅啓閫昏緫
-                                </span>
-                                <button onclick="addRewrite(${gIdx})" class="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-tighter transition-colors">+ 娣诲姞閲嶅啓琛?/button>
-                            </div>
-                            <div class="space-y-2">
-                                ${(group.rewrites || []).map((rule, rIdx) => `
-                                    <div class="flex gap-2 items-center">
-                                        <select onchange="configData.upstreams[${gIdx}].rewrites[${rIdx}].action=this.value" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg outline-none focus:border-blue-500">
-                                            <option value="REPLACE" ${rule.action==='REPLACE'?'selected':''}>REPLACE</option>
-                                            <option value="REMOVE" ${rule.action==='REMOVE'?'selected':''}>REMOVE</option>
-                                            <option value="ADD" ${rule.action==='ADD'?'selected':''}>ADD</option>
-                                        </select>
-                                        <input type="text" oninput="configData.upstreams[${gIdx}].rewrites[${rIdx}].path=this.value" value="${rule.path}" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg flex-1 font-mono outline-none focus:border-blue-500" placeholder="JSON Path">
-                                        <input type="text" oninput="configData.upstreams[${gIdx}].rewrites[${rIdx}].value=this.value" value="${rule.value || ''}" class="bg-slate-900 border border-slate-700 p-2 text-[10px] rounded-lg flex-1 outline-none focus:border-blue-500" placeholder="New Value">
-                                        <button onclick="removeRewrite(${gIdx}, ${rIdx})" class="text-slate-600 hover:text-red-500 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                                        </button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
+            alert('配置已应用');
         }
 
-        function toggleHost(gIdx, host) {
-            const group = configData.upstreams[gIdx];
-            if (!group.hosts) group.hosts = [];
-            const index = group.hosts.indexOf(host);
-            if (index > -1) group.hosts.splice(index, 1);
-            else group.hosts.push(host);
-            renderUpstreams();
-        }
-
-        function toggleRemainder(gIdx, checked) {
-            configData.upstreams.forEach((g, i) => {
-                if(i === gIdx) g.is_remainder = checked;
-                else if(checked) g.is_remainder = false;
-            });
-            renderUpstreams();
-        }
-
-        function addUpstream() {
-            configData.upstreams.push({ name: '鏂板垎缁?, base_url: '', hosts: [], rewrites: [], headers: [], is_remainder: false });
-            renderUpstreams();
-        }
-
-        function removeUpstream(idx) {
-            configData.upstreams.splice(idx, 1);
-            renderUpstreams();
-        }
-
-        function addRewrite(gIdx) {
-            if(!configData.upstreams[gIdx].rewrites) configData.upstreams[gIdx].rewrites = [];
-            configData.upstreams[gIdx].rewrites.push({ path: '', action: 'REPLACE', value: '' });
-            renderUpstreams();
-        }
-
-        function removeRewrite(gIdx, rIdx) {
-            configData.upstreams[gIdx].rewrites.splice(rIdx, 1);
-            renderUpstreams();
-        }
-
-        function addHeaderRule(gIdx) {
-            if (!configData.upstreams[gIdx].headers) configData.upstreams[gIdx].headers = [];
-            configData.upstreams[gIdx].headers.push({ name: 'Authorization', action: 'SET', value: '' });
-            renderUpstreams();
-        }
-
-        function removeHeaderRule(gIdx, hIdx) {
-            configData.upstreams[gIdx].headers.splice(hIdx, 1);
-            renderUpstreams();
-        }
-
-        function showTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('text-blue-500', 'border-b-2', 'border-blue-500');
-                el.classList.add('text-slate-500');
-            });
-            document.getElementById('tab-' + tab).classList.add('active');
-            event.target.classList.remove('text-slate-500');
-            event.target.classList.add('text-blue-500', 'border-b-2', 'border-blue-500');
-        }
-
-        const eventSource = new EventSource('/api/events');
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const logList = document.getElementById('log-list');
-            if(logList.innerHTML.includes('绛夊緟鏁版嵁娴佹帴鍏?)) logList.innerHTML = '';
-            
-            let statusColor = 'text-emerald-400';
-            if (data.status >= 300 && data.status < 400) statusColor = 'text-blue-400';
-            if (data.status >= 400 && data.status < 500) statusColor = 'text-orange-400';
-            if (data.status >= 500) statusColor = 'text-rose-500';
-
-            const logItem = document.createElement('div');
-            logItem.className = "hover:bg-slate-800/50 flex items-center py-1 px-2 rounded transition-colors group border-b border-slate-800/50 last:border-0";
-            logItem.innerHTML = `<span class="text-slate-600 w-24 shrink-0 font-mono text-[10px]">[${data.time}]</span> 
-                                <span class="${statusColor} w-10 text-center font-black mr-4">${data.status || '---'}</span>
-                                <span class="text-slate-200 shrink-0 font-bold truncate max-w-[200px]" title="${data.host}">${data.host}</span>
-                                <span class="mx-3 text-slate-700">鉃?/span>
-                                <span class="text-blue-500 shrink-0 italic truncate max-w-[150px]">${data.upstream}</span>
-                                <span class="ml-3 px-1.5 py-0.5 bg-slate-800 rounded text-[9px] font-black text-slate-500 uppercase">${data.rule}</span>
-                                <span class="text-slate-700 ml-auto text-[9px] font-black group-hover:text-slate-500 transition-colors uppercase">${data.duration}</span>`;
-            
-            // 灏嗘柊鏃ュ織鎻掑叆鍒版渶鍓嶉潰
-            logList.prepend(logItem);
-            
-            // 淇濇寔鏃ュ織鏁伴噺鍦?500 鏉′互鍐?            if (logList.childNodes.length > 500) {
-                logList.removeChild(logList.lastChild);
-            }
+        const es = new EventSource('/api/events');
+        es.onmessage = e => {
+            const data = JSON.parse(e.data);
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 p-1 border-b border-slate-700/50';
+            div.innerHTML = `
+                <span class="text-slate-500">${data.time}</span>
+                <span class="font-bold truncate w-24">${data.host}</span>
+                <span class="text-blue-400 flex-1">${data.upstream}</span>
+                <span class="font-bold">${data.status}</span>
+            `;
+            const container = document.getElementById('events');
+            container.insertBefore(div, container.firstChild);
         };
 
         loadConfig();
     </script>
 </body>
 </html>
-
-
