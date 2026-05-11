@@ -1,9 +1,9 @@
-﻿# Airoxy Linux
+﻿# AiMITM
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/openai/airoxy-linux)](https://goreportcard.com/report/github.com/openai/airoxy-linux)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Airoxy 是一款基于 Go 语言开发的高性能 HTTP/HTTPS 协议转发与内容改写引擎。它专为复杂的网络调试、API 桥接及自动化请求处理而设计，支持中间人攻击 (MITM) 技术，能够实现对加密流量的深度解析与实时篡改。
+AiMITM 是一款基于 Go 语言开发的高性能 HTTP/HTTPS 协议转发与内容改写引擎。它专为复杂的网络调试、API 桥接及自动化请求处理而设计，支持中间人攻击 (MITM) 技术，能够实现对加密流量的深度解析与实时篡改。
 
 ## 🚀 核心特性
 
@@ -20,7 +20,7 @@ Airoxy 是一款基于 Go 语言开发的高性能 HTTP/HTTPS 协议转发与内
 
 ```mermaid
 graph TD
-    Client([客户端]) --> Proxy[Airoxy 引擎]
+    Client([客户端]) --> Proxy[AiMITM 引擎]
     Proxy --> MITM{MITM 检查}
     MITM -- 不在列表 --> Tunnel[透明隧道/盲转]
     MITM -- 在列表 --> Decrypt[HTTPS 解密]
