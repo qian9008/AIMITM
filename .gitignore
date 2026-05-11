@@ -1,22 +1,14 @@
 ﻿# 缓存文件
 .gocache/
-runtime.log
-runtime.err
+*.log
+*.err
 
 # 配置文件
 config.json
-config - 副本.json
+*.json
 
-# 编译生成的二进制文件
-airoxy-core
-airoxy-core-linux
-airoxy-core-optimized.exe
-airoxy-core-optimized-final.exe
-*.exe
 
-# 证书目录（如果不想共享私钥）
-certs/*.key
-1/certs/*.key
+1/
 
 # 临时文件
 patch.diff
