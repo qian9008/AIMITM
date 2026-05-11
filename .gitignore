@@ -12,3 +12,6 @@ config.json
 
 # 临时文件
 patch.diff
+
+# 排除备份或临时目录
+1/
